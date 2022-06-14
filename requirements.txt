@@ -1,0 +1,7 @@
+numpy
+matplotlib
+astropy
+jplephem
+represent
+scipy
+sgp4

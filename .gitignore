@@ -1,0 +1,6 @@
+local
+__pycache__
+*.swp
+*.pyc
+*.FITS
+*.fits
