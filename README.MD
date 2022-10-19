@@ -164,8 +164,7 @@ The _lmn_ of each pixel is the projection of the pixel position __s__ in the _uv
 ### `tool.py` 
 - Functions for plotting the uv, beam and image. Now the displayed unit is milliarcsec (mas), you may change them to other units by modifying the source code.
 
-
-## **FITS-IDI** output
+## **FITS-IDI output **
 
 Omni*UV* supports exporting visibility and *uvw* data in `FITS-IDI` format, such that the simulation result could be imported to `AIPS` or `CASA` for further calibration and imaging. See the `to_fitisidi()` method in `run_example.py` for a demonstration.
 
@@ -174,3 +173,22 @@ Note that at present visibility records are not sorted in time order. This leads
 - `fitld`: load exported `fits-idi` file.
 - `uvsrt`: set `sort` to `'TB'`, this setting is **very important** for further processing.
 - `indxr`: generate index table `NX` and first `CL` table.
+
+## **DRO (Distant Retrograde Orbit)**
+Omni*UV* supports trajectory calculation for stations in Moon DRO. 
+This is performed by integrating the equation of motion numerically in the Moon-Earth system. The initial conditions of DRO are taken from Tab. 4.1 of the Master thesis by Zimovan (2017). The 20 orbits are calculated accordingly:
+  <img src="dro/fig/dros.png" alt = "Logo" style= "display: block; margin-left:0; margin-right:auto; width:100%;"/>
+Note that above calculations are performed in rotation frame by assuming the Moon orbit is perfect circle and are for demonstration only (by setting `do_dro_rot=True`). 
+
+In reality, Moon orbit is elliptical. Calculation is performed in the Earth barycentric frame by retrieving Moon and Earth positions at given time from JPL ephemeris DE421. As a result, the trajectory is not even close, as demonstrated below.
+ <img src="dro/fig/dro05_RK45_step60s.png" alt = "Logo" style= "display: block; margin-left:0; margin-right:auto; width:100%;"/>
+
+### `dro/fig/`
+Trajectories with different time steps and integration schemes are presented. Adjusting these parameters carefully.
+
+### `dro/gen_dro_rot.py`
+Demonstration of DRO in Omni*UV*. Note trajectories are presented in Moon-Earth rotation frame. By setting `do_dro_rot=True`, DROs are calculated in rotation frame directly and are for demonstration only. For actual calculation, set `do_dor_rot=False`. See comments in the program for detailed explanation.
+
+## **Halo orbit**
+One may obtain the L1 and L2 halo orbit by taking initial conditions in Tab. 4.3 and 4.4 of Zimovan (2017).
+
