@@ -1,7 +1,8 @@
 # encoding: utf-8
 from __future__ import absolute_import, division, print_function
 
-from represent import RepresentationMixin
+#from represent import RepresentationMixin
+from represent import ReprHelperMixin
 
 from . import constants as oc
 
@@ -18,7 +19,7 @@ __all__ = [
 ]
 
 
-class Body(RepresentationMixin, object):
+class Body(ReprHelperMixin, object):
     r"""Reference body for a Keplerian orbit.
 
     :param float mass: Mass (:math:`m`) [kg]

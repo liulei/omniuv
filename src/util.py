@@ -151,7 +151,7 @@ def rotm(angle, tp):
     ca = np.cos (angle)
     sa = np.sin (angle)
 
-    R = np.zeros((3, 3), dtype = np.float)
+    R = np.zeros((3, 3), dtype = np.float64)
 
     if tp == 1:
         R[0,0] = 1
