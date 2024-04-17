@@ -137,7 +137,7 @@ The _lmn_ of each pixel is the projection of the pixel position __s__ in the _uv
 
 -   To achieve the necessary precision for the trajectory calculation of earth fixed stations, `sofa` lib is needed. The source is provided in the `data/sofa` folder. To compile:
 
-    `cd data/cofa`
+    `cd data/sofa`
 
     `make`
 
