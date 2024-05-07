@@ -8,7 +8,7 @@ from tool import *
 # Specify the path that contains the omniuv package. 
 # Necessary when your source code and the pacakge are not in the same
 # folder.
-#sys.path.append('.')
+sys.path.append('.')
 
 # Import the specific OmniUV package
 from omniuv import * 
@@ -116,7 +116,9 @@ def main():
     s.set_sep_min_deg(Earth = 5.0)
 
 # Standard six orbital elements, a in meter, angles in radian
-    s.set_orbit(a=a, e=e, i=np.pi/6, raan=0.0, arg_pe=0.0, M0=0.0)
+# set t_ref to 2020-01-01T00:00:00 UTC 
+    s.set_orbit(a=a, e=e, i=np.pi/6, raan=0.0, arg_pe=0.0, M0=0.0, \
+            t_ref=datetime(2020, 1, 1, 0, 0, 0))
 
 # 3.6 cm, 30 m diameter
     s.set_SEFD(225.0) # in Jy
@@ -125,7 +127,8 @@ def main():
     s =   EarthOrbit('t2')
     s.set_sep_min_deg(Earth = 5.0)
 # Standard six orbital elements, a in meter, angles in radian
-    s.set_orbit(a=a, e=e, i=-np.pi/6, raan=0.0, arg_pe=0.0, M0=np.pi)
+# t_ref defaults to task.t0
+    s.set_orbit(a=a, e=e, i=-np.pi/6, raan=0.0, arg_pe=0.0, M0=np.pi, t_ref=t0)
 # 3.6 cm, 30 m diameter
     s.set_SEFD(225.0)
     stns.append(s)
@@ -165,7 +168,8 @@ def main():
 # Lunar orbit
     lo =   LunarOrbit('lo')
     lo.set_sep_min_deg(Moon=1.0)
-    lo.set_orbit(a=util.Rm*3, e=0.0, i=0.0, raan=0.0, arg_pe=0.0, M0=0.0)
+# t_ref defaults to task.t0
+    lo.set_orbit(a=util.Rm*3, e=0.0, i=0.0, raan=0.0, arg_pe=0.0, M0=0.0, t_ref=t0)
     lo.set_SEFD(507)
     if with_moon:
         stns.append(lo)

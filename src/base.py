@@ -3,7 +3,8 @@
 import sys, os
 import numpy as np
 from datetime import datetime, timedelta
-from astropy import units as un, constants as const
+from astropy import units as un, constants as const, time as atime
+
 from . import util
 
 class Image(object):
@@ -49,7 +50,7 @@ class Task(object):
         if not hasattr(self, 'tmu'):
             print('Task.calc_jd(): please call set_eops() first!')
             sys.exit(0)
-        assert t >= self.t0 # actual UTC time, not t in ts array!
+#        assert t >= self.t0 # actual UTC time, not t in ts array!
         return util.DT_JD + (t - util.T0_MJD).total_seconds() / 86400. + (32.184 + self.tmu)/86400.
 
     def set_ts(self, t0, ts):
@@ -214,7 +215,7 @@ class Station(object):
         self.task   =   task
 
     def set_orbit(self, a = 0.0, e = 0.0, i = 0.0, raan = 0.0, \
-                        arg_pe = 0.0, M0 = 0.0):
+                        arg_pe = 0.0, M0 = 0.0, t_ref=None):
 
         if self.type != 'orbit':
             print('Error: station %s, set_orbit() can only be called in orbit type (this type: %s)' % (self.name, self.type))
@@ -230,6 +231,15 @@ class Station(object):
         self.orbit.raan     =   raan
         self.orbit.arg_pe   =   arg_pe
         self.orbit.M0       =   M0
+
+        if t_ref != None:
+            self.orbit.ref_epoch    =   atime.Time(t_ref, scale='utc')
+
+        print('Station %s:' % (self.name))
+        print(self.orbit)
+        print('')
+
+        self.t_ref  =   t_ref
 
         self.uvw_updated    =   False
 

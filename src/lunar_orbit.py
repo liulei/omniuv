@@ -23,6 +23,14 @@ class LunarOrbit(Station):
 # nt, 3
     def calc_crs(self):
 
-        self.p_lcs  =   np.array([self._ob2lcs(t) for t in self.task.ts])
+        if self.t_ref == None:
+            print('LunarOrbit.calc_crs(%s): t_ref is not set, use task.t0' % (self.name))
+            t_ref   =   self.task.t0
+        else:
+            t_ref   =   self.t_ref
+
+        t_offset    =   (self.task.t0 - t_ref).total_seconds()
+
+        self.p_lcs  =   np.array([self._ob2lcs(t+t_offset) for t in self.task.ts])
         return self.p_lcs + self.task.crs_moon
 

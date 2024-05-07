@@ -22,5 +22,14 @@ class EarthOrbit(Station):
         
 # nt, 3
     def calc_crs(self):
-        return np.array([self._ob2crs(t) for t in self.task.ts])
+
+        if self.t_ref == None:
+            print('EarthOrbit.calc_crs(%s): t_ref is not set, use task.t0' % (self.name))
+            t_ref   =   self.task.t0
+        else:
+            t_ref   =   self.t_ref
+
+        t_offset    =   (self.task.t0 - t_ref).total_seconds()
+
+        return np.array([self._ob2crs(t+t_offset) for t in self.task.ts])
 

@@ -124,6 +124,7 @@ libsofa =   None
 path_libsofa    =   '%s/data/sofa/libsofa_c.so' % (path_home)
 if os.path.exists(path_libsofa):
 #    libsofa =   ctypes.CDLL('./libsofa_c.so')
+    print('util.py: load %s' % (path_libsofa))
     libsofa =   ctypes.CDLL(path_libsofa)
 def xys2006a(tt):
 
@@ -335,7 +336,7 @@ def plot_crs(task):
         
     plt.show()
 
-def plot_lcs(task):
+def plot_lcs(task, name):
 
     fig =   plt.figure()
     ax  =   fig.add_subplot(projection = '3d')
@@ -344,7 +345,7 @@ def plot_lcs(task):
             print('util.plot_lcs(): skip none lunar station %s' % (stn.name))
             continue
         x, y, z =   zip(*stn.p_lcs.tolist())
-        ax.plot(x, y, z)
+        ax.plot(x, y, z, label=stn.name)
 
     lim =   (-Rm, Rm)
 #    ax.set_xlim(lim)
@@ -355,10 +356,13 @@ def plot_lcs(task):
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
 
-    plt.show()
+    plt.legend()
 
-    print('Exit after util.plot_lcs()')
-    sys.exit(0)
+#    plt.show()
+    plt.savefig('%s.png' % (name))
+
+#    print('Exit after util.plot_lcs()')
+#    sys.exit(0)
 
 def mas2rad(mas):
     return mas / 1E3 / 3600 / 180. * np.pi
