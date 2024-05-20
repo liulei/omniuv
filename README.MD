@@ -11,7 +11,7 @@ We develop Omni*UV*, so as to fulfill the requirement of simulation for both gro
 
 1. The paper for this toolkit has been made available online:
 
--  `Lei Liu, Weimin Zheng, Jian Fu, Zhijun Xu, "OmniUV: A Multi-Purpose Simulation Toolkit for VLBI Observation", 2022, arXiv:2201.03797`
+-  `Lei Liu, Weimin Zheng, Jian Fu, Zhijun Xu, "OmniUV: A Multi-Purpose Simulation Toolkit for VLBI Observation", 2022, AJ, 164, 67, arXiv:2201.03797`
 
     We require that you cite the above reference and the repo link (`https://github.com/liulei/omniuv`) in your paper. 
 
