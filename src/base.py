@@ -276,6 +276,7 @@ class Station(object):
                             _calc_sep, \
                             calc_sep_moon, \
                             calc_sep_earth, \
+                            calc_sep_sun, \
                             calc_idt_sep_src, \
                             set_el_min_deg, \
                             _calc_el, \

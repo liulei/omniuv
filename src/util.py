@@ -24,6 +24,7 @@ r_ME_L2 =   0.167802559989682 # L2 ME
 cbs =   { \
     'Earth' :    {'R': Re}, \
     'Moon'  :    {'R': Rm}, \
+    'Sun'   :    {'R': Rs}
 }
 
 # 0: earth, 1: sun, 2: moon, 3: mercury, 4: venus, 5: mars, 6: jup, 

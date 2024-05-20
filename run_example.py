@@ -167,7 +167,7 @@ def main():
 
 # Lunar orbit
     lo =   LunarOrbit('lo')
-    lo.set_sep_min_deg(Moon=1.0)
+    lo.set_sep_min_deg(Moon=1.0, Sun=10.0)
 # t_ref defaults to task.t0
     lo.set_orbit(a=util.Rm*3, e=0.0, i=0.0, raan=0.0, arg_pe=0.0, M0=0.0, t_ref=t0)
     lo.set_SEFD(507)
