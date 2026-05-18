@@ -69,7 +69,7 @@ __w__ = __s0__,
 
  __u__ is the direction perpendicularto the plane defined by __n__ and __w__:
 
-__u__ = __n__ x __w__,
+__u__ = __n__ x __w__ / |__n__ x __w__|,
 
 
 __v__ is defined accordingly:

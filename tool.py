@@ -2,6 +2,7 @@
 
 import numpy as np
 import sys
+import os
 from matplotlib import pyplot as plt, rc
 from mpl_toolkits.mplot3d import Axes3D
 from astropy import constants as const
@@ -262,3 +263,80 @@ def rad2deg(rad):
 
 def mas2rad(mas):
     return mas / 1E3 / 3600 / 180. * np.pi
+
+def plot_ssp(task, proj='cyl'):
+    """
+    Plot subsatellite point (SSP) tracks for stations with SSP dumping enabled.
+    
+    Args:
+        task: Task object containing stations
+        proj: Projection type for Basemap (default: 'cyl' for cylindrical)
+    """
+
+
+    try:
+        from mpl_toolkits.basemap import Basemap
+        HAS_BASEMAP = True
+    except ImportError:
+        HAS_BASEMAP = False
+        print('Warning: basemap not available. plot_ssp() will not work. Install with: conda install basemap or pip install basemap')
+        return
+
+#    if not HAS_BASEMAP:
+#        print('Error: basemap is required for plot_ssp(). Please install it with: conda install basemap or pip install basemap')
+#        return
+    
+    for stn in task.stns:
+        if not (hasattr(stn, 'dump_ssp') and stn.dump_ssp):
+            continue
+        
+        # Check if p_lon and p_lat are available
+        if not (hasattr(stn, 'p_lon') and hasattr(stn, 'p_lat')):
+            print('Warning: station %s has SSP dump enabled but p_lon/p_lat not available. Skipping plot.' % (stn.name))
+            continue
+        
+        plt.clf()
+        fig = plt.figure(figsize=(12, 6))
+        ax = fig.add_subplot(111)
+        
+        # Create map with specified projection
+        m = Basemap(projection=proj, lon_0=0, resolution='c', ax=ax)
+        
+        # Draw map features
+        m.drawcoastlines(linewidth=0.5)
+        m.drawcountries(linewidth=0.5)
+        m.drawmapboundary(fill_color='lightblue')
+        m.fillcontinents(color='lightgray', lake_color='lightblue')
+        # Set meridian labels based on projection type
+        # Mollweide projection doesn't support meridian labels
+        if proj == 'moll':
+            meridian_labels = [0,0,0,0]
+        else:
+            meridian_labels = [0,0,0,1]
+        m.drawmeridians(np.arange(-180, 181, 60), labels=meridian_labels, linewidth=0.5)
+        m.drawparallels(np.arange(-90, 91, 30), labels=[1,0,0,0], linewidth=0.5)
+        
+        # Plot SSP track
+        lon = stn.p_lon
+        lat = stn.p_lat
+        
+        # Convert to map coordinates
+        x, y = m(lon, lat)
+        
+        # Plot the track with dots only
+        m.plot(x, y, 'r.', markersize=2, label='SSP track')
+        m.plot(x[0], y[0], 'go', markersize=8, label='Start')
+        m.plot(x[-1], y[-1], 'ro', markersize=8, label='End')
+        
+        plt.title('Subsatellite Point Track: %s' % (stn.name), fontsize=14, fontweight='bold')
+        plt.legend(loc='lower left', fontsize=10)
+        
+        # Save figure
+        ssp_dir = 'ssp'
+        if not os.path.exists(ssp_dir):
+            os.makedirs(ssp_dir)
+        
+        filename = os.path.join(ssp_dir, '%s.png' % (stn.name))
+        plt.savefig(filename, dpi=150, bbox_inches='tight')
+        print('SSP plot saved to: %s' % (filename))
+        plt.close()

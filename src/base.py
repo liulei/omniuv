@@ -210,6 +210,8 @@ class Station(object):
         self.uvw_updated    =   False
 
         self.sep_min    =   {}
+        
+        self.dump_ssp   =   False
 
     def set_task(self, task):
         self.task   =   task
@@ -245,6 +247,9 @@ class Station(object):
 
     def set_SEFD(self, SEFD):
         self.SEFD   =   SEFD
+    
+    def set_ssp(self, enable):
+        self.dump_ssp   =   enable
         
     def calc_crs(self):
         print('Error: station %s, class %s, calc_crs() method has not been implemented!' % (self.name, type(self).__name__))
@@ -258,6 +263,11 @@ class Station(object):
 
 # nt, 3 (xyz)
         self.p_crs  =   self.calc_crs()
+        
+        if hasattr(self, 'dump_ssp') and self.dump_ssp:
+            self.calc_ssp()
+            self.write_ssp()
+        
         uvw =   []
 # ruvw: 3, 3 (uvw unit vec)
         for src in self.task.srcs:
@@ -271,6 +281,55 @@ class Station(object):
 
 # nsrc, nt, 3(uvw)
         return self.uvw
+
+    def _crs2trs(self, t):
+        utc     =   self.task.t0 + timedelta(seconds = t)
+        mjd     =   util.utc2mjd(utc)
+        R       =   util.calc_t2c_R(self.task.dut1, mjd)
+        task    =   self.task
+        PN, W =   util.calc_t2c_PN_W(mjd, task.tmu, task.dut1, task.xp, task.yp)
+# TRS to CRS: m = PN @ R @ W
+# CRS to TRS: m_inv = W.T @ R.T @ PN.T
+        m_inv   =   np.einsum('ij,jk,kl->il', W.T, R.T, PN.T)
+        return m_inv
+    
+    def calc_ssp(self):
+        if not hasattr(self, 'p_crs'):
+            print('Error: station %s, calc_ssp() requires p_crs to be calculated first!' % (self.name))
+            sys.exit(0)
+        
+        nt  =   len(self.task.ts)
+        p_trs_list  =   []
+        
+        print('nt: %d' % (nt))
+        for i in range(nt):
+            t   =   self.task.ts[i]
+            m_inv   =   self._crs2trs(t)
+            p_crs_t =   self.p_crs[i]
+            p_trs_t =   np.einsum('ij,j->i', m_inv, p_crs_t)
+            p_trs_list.append(p_trs_t)
+        
+        self.p_trs  =   np.array(p_trs_list)
+        
+        r   =   np.linalg.norm(self.p_trs, axis=1)
+        self.p_lon  =   np.arctan2(self.p_trs[:, 1], self.p_trs[:, 0]) * 180.0 / np.pi
+        self.p_lat  =   np.arcsin(self.p_trs[:, 2] / r) * 180.0 / np.pi
+    
+    def write_ssp(self):
+        if not hasattr(self, 'p_lon') or not hasattr(self, 'p_lat'):
+            print('Error: station %s, write_ssp() requires calc_ssp() to be called first!' % (self.name))
+            sys.exit(0)
+        
+        ssp_dir =   'ssp'
+        if not os.path.exists(ssp_dir):
+            os.makedirs(ssp_dir)
+        
+        filename    =   os.path.join(ssp_dir, '%s.txt' % (self.name))
+        
+        with open(filename, 'w') as f:
+            f.write('# index, time (s), longitude (deg), latitude (deg)\n')
+            for i in range(len(self.task.ts)):
+                f.write('%d %.6f %.3f %.3f\n' % (i, self.task.ts[i], self.p_lon[i], self.p_lat[i]))
 
     from ._el_sep import set_sep_min_deg, \
                             _calc_sep, \

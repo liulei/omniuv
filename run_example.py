@@ -13,7 +13,8 @@ sys.path.append('.')
 # Import the specific OmniUV package
 from omniuv import * 
 
-with_moon   =   True
+#with_moon   =   True
+with_moon   =   False
 
 def gen_ts1():
     ts  =   86400*0.0 + np.arange(0, 24 * 60 * 60, 60, dtype = float)
@@ -122,6 +123,7 @@ def main():
 
 # 3.6 cm, 30 m diameter
     s.set_SEFD(225.0) # in Jy
+    s.set_ssp(True)  # Enable SSP dumping
     stns.append(s)
 
     s =   EarthOrbit('t2')
@@ -329,7 +331,7 @@ def main():
 
 # The visibility simumation result together with the calculated UVW 
 # could be exported to FITS-IDI format:
-    task.to_fitsidi('EXAMPLE', bls)
+#    task.to_fitsidi('EXAMPLE', bls)
 
 # Radial weighting, default to False
     task.do_rad     =   False
@@ -367,6 +369,9 @@ def main():
     plot_beam(beam, cs, nc, 'example_beam.png')
     plot_uv(uv, cs, nc, 'example_uv.png')
     plot_image(image, cs, nc, 'example_image.png')
+    
+    # Plot SSP tracks for stations with SSP dumping enabled
+    plot_ssp(task, proj='cyl')
     
 if __name__ == '__main__':
     main()
