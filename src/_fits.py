@@ -110,7 +110,9 @@ def gen_AG(self):
     cols.append(fits.Column(name='ANNAME', format='8A', unit=0, array=ANNAME))
     cols.append(fits.Column(name='STABXYZ', format='3D', unit='METERS', array=STABXYZ))
     cols.append(fits.Column(name='DERXYZ', format='3E', unit='M/SEC', array=DERXYZ))
-    cols.append(fits.Column(name='ORBPARM', format='0D', unit=0, array=ORBPARM))
+    # MODIFIED: astropy >= 6 needs a zero-width column to still carry row count.
+    cols.append(fits.Column(name='ORBPARM', format='0D', unit=0,
+                            array=np.empty((nstn, 0), dtype=np.float64)))
     cols.append(fits.Column(name='NOSTA', format='1J', unit=0, array=NOSTA))
  
     cols.append(fits.Column(name='MNTSTA', format='1J', unit=0, array=MNTSTA))
@@ -157,16 +159,18 @@ def gen_SU(self):
     ra      =   util.rad2deg(src.ra)
     dec     =   util.rad2deg(src.dec)
 
-    FLUX    =   [np.array(np.zeros(nfreq, dtype='>f4'))]
+    FLUX1   =   [np.array(np.ones(nfreq, dtype='>f4'))]
+    FLUX   =   [np.array(np.zeros(nfreq, dtype='>f4'))]
 
-    src.name    =   '3C288'
+#    src.name    =   '3C288'
+    src.name    =   self.srcs[0].name
     cols    =   []
     cols.append(fits.Column(name='SOURCE_ID', format='1J', array=[1]))
     cols.append(fits.Column(name='SOURCE', format='16A', array=[self.srcs[0].name]))
     cols.append(fits.Column(name='QUAL', format='1J', array=[0]))
     cols.append(fits.Column(name='CALCODE', format='4A', array=['']))
     cols.append(fits.Column(name='FREQID', format='1J', array=[1]))
-    cols.append(fits.Column(name='IFLUX', format='%dE'%(nfreq), unit='JY', array=FLUX))
+    cols.append(fits.Column(name='IFLUX', format='%dE'%(nfreq), unit='JY', array=FLUX1))
     cols.append(fits.Column(name='QFLUX', format='%dE'%(nfreq), unit='JY', array=FLUX))
     cols.append(fits.Column(name='UFLUX', format='%dE'%(nfreq), unit='JY', array=FLUX))
     cols.append(fits.Column(name='VFLUX', format='%dE'%(nfreq), unit='JY', array=FLUX))
@@ -268,11 +272,13 @@ def gen_AN(self):
 
     cols.append(fits.Column(name='POLTYA', format='1A', array=['R']*nstn))
     cols.append(fits.Column(name='POLAA', format='%dE'%(nfreq), unit='DEGREES', array=[[0.0]*nfreq]*nstn))
-    cols.append(fits.Column(name='POLCALA', format='0E', array=[]))
+    # MODIFIED: astropy >= 6 needs a zero-width column to still carry row count.
+    cols.append(fits.Column(name='POLCALA', format='0E', array=np.empty((nstn, 0), dtype=np.float32)))
 
     cols.append(fits.Column(name='POLTYB', format='1A', array=['L']*nstn))
     cols.append(fits.Column(name='POLAB', format='%dE'%(nfreq), unit='DEGREES', array=[[0.0]*nfreq]*nstn))
-    cols.append(fits.Column(name='POLCALB', format='0E', array=[]))
+    # MODIFIED: astropy >= 6 needs a zero-width column to still carry row count.
+    cols.append(fits.Column(name='POLCALB', format='0E', array=np.empty((nstn, 0), dtype=np.float32)))
 
     h   =   fits.Header()
     h['EXTNAME']    =   'ANTENNA'
@@ -364,7 +370,8 @@ def gen_UV(self, bls):
     cols.append(fits.Column(name='FREQID', format='1J', array=FREQID))
     cols.append(fits.Column(name='INTTIM', format='1E', array=INTTIM, unit='SECONDS'))
     cols.append(fits.Column(name='WEIGHT', format='%dE'%(nfreq), array=WEIGHT))
-    cols.append(fits.Column(name='GATEID', format='0J', array=GATEID))
+    # MODIFIED: astropy >= 6 needs a zero-width column to still carry row count.
+    cols.append(fits.Column(name='GATEID', format='0J', array=np.empty((nvis, 0), dtype=np.int32)))
     cols.append(fits.Column(name='FLUX', format='%dE'%(ndata), array=FLUX, unit='UNCALIB'))
            
     h   =   fits.Header()
@@ -398,8 +405,10 @@ def gen_UV(self, bls):
     h['MAXIS2']     =   npolar
     h['CTYPE2']     =   'STOKES'
     h['CDELT2']     =   -1.0
+#    h['CDELT2']     =   1
     h['CRPIX2']     =   1.0
     h['CRVAL2']     =   -1.0
+#    h['CRVAL2']     =   1
             
     h['MAXIS3']     =   nchan
     h['CTYPE3']     =   'FREQ'

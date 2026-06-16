@@ -331,7 +331,7 @@ def main():
 
 # The visibility simumation result together with the calculated UVW 
 # could be exported to FITS-IDI format:
-#    task.to_fitsidi('EXAMPLE', bls)
+    task.to_fitsidi('EXAMPLE', bls)
 
 # Radial weighting, default to False
     task.do_rad     =   False
